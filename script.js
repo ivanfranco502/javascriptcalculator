@@ -15,7 +15,9 @@ class CalculatorApp extends React.Component
 
     this.handleClear = this.handleClear.bind(this);
     this.handleNumber = this.handleNumber.bind(this);
-    // this.handleOperator = this.handleOperator.bind(this);
+    this.handleOperator = this.handleOperator.bind(this);
+    this.handleEquals = this.handleEquals.bind(this);
+    this.handleDecimal = this.handleDecimal.bind(this);
   }
 
   handleClear()
@@ -43,6 +45,18 @@ class CalculatorApp extends React.Component
           outputValue: value };
 
       }
+
+      let last = state.inputValue.length - 1;
+      let lastValue = state.inputValue[last];
+
+      if (["/", "*", "+", "-"].includes(lastValue))
+      {
+        return {
+          inputValue: state.inputValue + value,
+          outputValue: value };
+
+      }
+
       return {
         inputValue: state.inputValue + value,
         outputValue: state.outputValue + value };
@@ -57,45 +71,26 @@ class CalculatorApp extends React.Component
     this.setState(
     state => {
       let last = state.inputValue.length - 1;
+      let previousLast = last - 1;
       let lastValue = state.inputValue[last];
+      let previousValue = state.inputValue[previousLast];
       if (["/", "*", "+", "-"].includes(lastValue))
       {
-        if (lastValue === "-" && value === "-")
+        if (["/", "*", "+", "-"].includes(previousValue))
         {
-          let previousLast = last - 1;
-          if (["/", "*", "+", "-"].includes(state.inputValue[previousLast]))
-          {
-            return {
-              inputValue: state.inputValue.substring(0, previousLast) + value,
-              outputValue: value };
-
-          }
-
           return {
-            inputValue: state.inputValue.substring(0, last) + value,
+            inputValue: state.inputValue.substring(0, previousLast) + value,
             outputValue: value };
 
         }
-        if (value !== "-")
+        if (value != "-")
         {
           return {
             inputValue: state.inputValue.substring(0, last) + value,
             outputValue: value };
 
-        }
-        if (value === "-")
-        {
-          let previousLast = last - 1;
-          if (["/", "*", "+", "-"].includes(state.inputValue[previousLast]))
-          {
-            return {
-              inputValue: state.inputValue.substring(0, previousLast) + value,
-              outputValue: value };
-
-          }
         }
       }
-
       return {
         inputValue: state.inputValue + value,
         outputValue: value };
@@ -107,7 +102,28 @@ class CalculatorApp extends React.Component
 
   handleEquals()
   {
-    this.setState(state => ({ outputValue: eval(state.inputValue) }));
+    this.setState((state) => (
+    {
+      inputValue: eval(state.inputValue),
+      outputValue: eval(state.inputValue) }));
+
+
+  }
+
+  handleDecimal()
+  {
+    this.setState((state) =>
+    {
+      if (state.outputValue.includes("."))
+      {
+        return state;
+      }
+      return {
+        inputValue: state.inputValue + ".",
+        outputValue: state.outputValue + "." };
+
+    });
+
   }
 
   render() {
@@ -142,9 +158,9 @@ class CalculatorApp extends React.Component
       React.createElement(Button, { id: "nine", type: "primary", size: "4", text: "9", handleClick: () => this.handleNumber("9") })),
 
       React.createElement("div", { className: "row" },
-      React.createElement(Button, { id: "decimal", type: "primary", size: "4", text: "." }),
+      React.createElement(Button, { id: "decimal", type: "primary", size: "4", text: ".", handleClick: this.handleDecimal }),
       React.createElement(Button, { id: "zero", type: "primary", size: "4", text: "0", handleClick: () => this.handleNumber("0") }),
-      React.createElement(Button, { id: "equals", type: "secondary", size: "4", text: "=" }))));
+      React.createElement(Button, { id: "equals", type: "secondary", size: "4", text: "=", handleClick: this.handleEquals }))));
 
 
 
